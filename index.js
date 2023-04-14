@@ -1,7 +1,7 @@
 const express = require("express");
 const { graphqlHTTP } = require("express-graphql");
 const { connectDB } = require("./database");
-const { RootQuery } = require("./queries");
+const { RootQuery, RootMutation } = require("./queries");
 const { GraphQLSchema } = require("graphql");
 const { seedData } = require("./seeddata");
 
@@ -12,7 +12,8 @@ connectDB();
 seedData();
 
 const schema = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: RootMutation,
 })
 
 //pass the schema to our GraphQL middleware:
