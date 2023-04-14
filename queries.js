@@ -3,7 +3,8 @@ const {
     GraphQLID,
     GraphQLString,
     GraphQLList,
-    GraphQLInt
+    GraphQLInt,
+    GraphQLNonNull
 } = require("graphql");
 const { Land, Owner } = require("./database");
 
@@ -86,3 +87,60 @@ exports.RootQuery = new GraphQLObjectType({
         }
     }),
 });
+
+exports.RootMutation = new GraphQLObjectType({
+    name: "RootMutation",
+    description: "The Root Mutation",
+    fields: () => ({
+        addOwner: {
+            type: OwnerType,
+            description: "Adds a new owner",
+            args: {
+                name: {
+                    type: new GraphQLNonNull(GraphQLString)
+                },
+                id: {
+                    type: new GraphQLNonNull(GraphQLString)
+                }
+            },
+            resolve: async (_, args) => {
+                const owner = { _id: args.id, name: args.name };
+                return await Owner.create(owner);
+            },
+        },
+        updateOwner: {
+            type: OwnerType,
+            description: "Updates an owner",
+            args: {
+                name: {
+                    type: new GraphQLNonNull(GraphQLString)
+                },
+                id: {
+                    type: new GraphQLNonNull(GraphQLString)
+                }
+            },
+            resolve: async (_, args) => {
+                let owner = await Owner.findById(args.id);
+
+                if (!owner) {
+                    throw new Error(`Could not find owner with id: ${args.id}`);
+                }
+
+                owner.name = args.name;
+                return await owner.save();
+            },
+        },
+        deleteOwner: {
+            type: OwnerType,
+            description: "Delete an owner",
+            args: {
+                id: {
+                    type: new GraphQLNonNull(GraphQLString)
+                }
+            },
+            resolve: async (_, args) => {
+                return await Owner.findByIdAndDelete(args.id);
+            },
+        }
+    })
+})
