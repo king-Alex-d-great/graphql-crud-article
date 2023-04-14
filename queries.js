@@ -144,3 +144,5 @@ exports.RootMutation = new GraphQLObjectType({
         }
     })
 })
+
+module.exports = {OwnerType, LandType}
